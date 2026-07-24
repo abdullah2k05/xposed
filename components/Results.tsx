@@ -7,25 +7,32 @@ import AuraAnalysis from './AuraAnalysis'
 import BeautyRanking from './BeautyRanking'
 import NpcClassCard from './NpcClassCard'
 import FunExtras from './FunExtras'
-import ShareCard from './ShareCard'
 
 export default function Results({ data }: { data: XposedResult }) {
   return (
-    <div className="w-full max-w-4xl mx-auto mt-10 space-y-8">
+    <>
       <div className="text-center">
-        <h2 className="text-2xl font-black text-white mb-1">
-          {data.displayName}
-        </h2>
-        <p className="text-gray-500">@{data.username}</p>
-        <div className="mt-3 inline-flex items-center gap-2 bg-gray-900/60 px-4 py-2 rounded-full border border-gray-800">
-          <span className="text-sm text-gray-400">Overall Score</span>
-          <span
-            className="text-2xl font-black"
-            style={{ color: data.aura.hex }}
-          >
-            {data.overallScore}
-          </span>
-          <span className="text-sm text-gray-600">/100</span>
+        <div className="flex items-center justify-center gap-4 mb-2">
+          {data.avatarUrl && (
+            <div
+              className="w-14 h-14 rounded-full bg-gray-800 border-2 border-gray-700"
+              style={{
+                backgroundImage: `url(${data.avatarUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            />
+          )}
+          <div className="text-left">
+            <h2 className="text-2xl font-black text-white">{data.displayName}</h2>
+            <p className="text-gray-500">@{data.username}</p>
+          </div>
+          <div className="ml-4 text-center">
+            <p className="text-xs text-gray-600 uppercase tracking-wider">Score</p>
+            <p className="text-4xl font-black" style={{ color: data.aura.hex }}>
+              {data.overallScore}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -48,7 +55,10 @@ export default function Results({ data }: { data: XposedResult }) {
       </div>
 
       <FunExtras data={data} />
-      <ShareCard data={data} />
-    </div>
+
+      <div className="text-center py-4 border-t border-gray-800">
+        <p className="text-sm text-gray-600 font-semibold">xposed.mabdullah.top</p>
+      </div>
+    </>
   )
 }
