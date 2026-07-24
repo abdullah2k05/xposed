@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import html2canvas from 'html2canvas'
-import { Download, Share2, Link, Check } from 'lucide-react'
+import { Download, Share2, Link, Check, Image } from 'lucide-react'
 import SearchInput from '@/components/SearchInput'
 import Results from '@/components/Results'
 import TopUsers from '@/components/TopUsers'
+import ShareCard from '@/components/ShareCard'
 import Donate from '@/components/Donate'
 import type { XposedResult, StoredProfile } from '@/lib/types'
 
@@ -17,7 +18,30 @@ export default function Home() {
   const [downloading, setDownloading] = useState(false)
   const [downloaded, setDownloaded] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
-  const resultsRef = useRef<HTMLDivElement>(null)
+  const [assetsReady, setAssetsReady] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!result) { setAssetsReady(false); return }
+    const imgs = document.querySelectorAll('#share-card img')
+    if (imgs.length === 0) { setAssetsReady(true); return }
+    let loaded = 0
+    imgs.forEach((img) => {
+      if ((img as HTMLImageElement).complete) {
+        loaded++
+      } else {
+        img.addEventListener('load', () => {
+          loaded++
+          if (loaded === imgs.length) setAssetsReady(true)
+        })
+        img.addEventListener('error', () => {
+          loaded++
+          if (loaded === imgs.length) setAssetsReady(true)
+        })
+      }
+    })
+    if (loaded === imgs.length) setAssetsReady(true)
+  }, [result])
 
   const handleAnalyze = useCallback(async (username: string) => {
     setLoading(true)
@@ -40,12 +64,12 @@ export default function Home() {
   }, [])
 
   const handleDownload = async () => {
-    if (!resultsRef.current) return
+    if (!cardRef.current) return
     setDownloading(true)
     try {
-      const canvas = await html2canvas(resultsRef.current, {
-        backgroundColor: '#0a0a0f',
-        scale: 2,
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: null,
+        scale: 3,
         useCORS: true,
         allowTaint: false,
         logging: false,
@@ -68,9 +92,8 @@ export default function Home() {
     const text =
       `I just got xposed! 🫣\n\n` +
       `Score: ${result.overallScore}/100\n` +
-      `Ban Risk: ${result.banClock.score}%\n` +
       `Aura: ${result.aura.color} — ${result.aura.vibe}\n` +
-      `Rating: ${result.profileRating.overall}/10\n` +
+      `Ban Risk: ${result.banClock.score}%\n` +
       `Beauty: ${result.beautyRanking.score}/100\n` +
       `Flop Rate: ${result.flopRate.percentage}%\n` +
       `Spirit Animal: ${result.spiritAnimal.emoji} ${result.spiritAnimal.animal}\n\n` +
@@ -121,45 +144,69 @@ export default function Home() {
         {result && (
           <>
             <hr className="my-10 sm:my-14 border-gray-800/60" />
-            <div ref={resultsRef} className="space-y-5 sm:space-y-6">
-              <Results data={result} />
-              <div className="flex flex-col sm:flex-row justify-center gap-3 pt-4">
-                <button
-                  onClick={handleDownload}
-                  disabled={downloading}
-                  className="btn-primary w-full sm:w-auto"
-                >
-                  {downloading ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Download className="w-5 h-5" />
-                  )}
-                  {downloading ? 'Downloading...' : 'Download Image'}
-                </button>
-                <button
-                  onClick={handleShare}
-                  className="btn-secondary w-full sm:w-auto"
-                >
-                  <Share2 className="w-5 h-5" />
-                  Share on X
-                </button>
-                <button
-                  onClick={handleCopyLink}
-                  className="btn-secondary w-full sm:w-auto"
-                >
-                  {linkCopied ? (
-                    <Check className="w-5 h-5 text-green-400" />
-                  ) : (
-                    <Link className="w-5 h-5" />
-                  )}
-                  {linkCopied ? 'Copied!' : 'Copy Link'}
-                </button>
-              </div>
-              {downloaded && (
-                <p className="text-center text-xs text-emerald-400 font-medium">Image downloaded!</p>
-              )}
+            <Results data={result} />
+
+            <hr className="my-10 sm:my-14 border-gray-800/60" />
+            <div className="text-center mb-6">
+              <h3 className="text-base sm:text-lg font-bold text-white flex items-center justify-center gap-2">
+                <Image className="w-5 h-5 text-purple-400" />
+                Share Card Preview
+              </h3>
+              <p className="text-xs text-gray-500 mt-1">This image will be downloaded. Share it on X.</p>
             </div>
+
+            {/* Share Card — dedicated export component */}
             <div className="flex justify-center">
+              <div className="scale-[0.85] sm:scale-100 origin-top">
+                <div id="share-card">
+                  <ShareCard ref={cardRef} data={result} />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row justify-center gap-3 mt-8">
+              <button
+                onClick={handleDownload}
+                disabled={downloading || !assetsReady}
+                className="btn-primary w-full sm:w-auto"
+              >
+                {downloading ? (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Download className="w-5 h-5" />
+                )}
+                {downloading ? 'Rendering...' : 'Download Image'}
+              </button>
+              <button
+                onClick={handleShare}
+                className="btn-secondary w-full sm:w-auto"
+              >
+                <Share2 className="w-5 h-5" />
+                Share on X
+              </button>
+              <button
+                onClick={handleCopyLink}
+                className="btn-secondary w-full sm:w-auto"
+              >
+                {linkCopied ? (
+                  <Check className="w-5 h-5 text-green-400" />
+                ) : (
+                  <Link className="w-5 h-5" />
+                )}
+                {linkCopied ? 'Copied!' : 'Copy Link'}
+              </button>
+            </div>
+
+            {!assetsReady && (
+              <p className="text-center text-xs text-gray-600 mt-2">Loading assets for download...</p>
+            )}
+            {downloaded && (
+              <p className="text-center text-xs text-emerald-400 font-medium mt-2">
+                Downloaded at 3× resolution (sharp on all screens)
+              </p>
+            )}
+
+            <div className="flex justify-center mt-8">
               <Donate />
             </div>
           </>
