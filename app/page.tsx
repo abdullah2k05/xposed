@@ -56,7 +56,7 @@ export default function Home() {
     await document.fonts.ready
     const canvas = await html2canvas(captureRef.current, {
       backgroundColor: null,
-      scale: 1,
+      scale: 2,
       useCORS: true,
       allowTaint: false,
       logging: false,

@@ -8,93 +8,126 @@ interface ShareCardProps {
 }
 
 const ShareCard = forwardRef<HTMLDivElement, ShareCardProps>(({ data }, ref) => {
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=72x72&data=${encodeURIComponent('https://xposed.mabdullah.top')}&bgcolor=0a0a0f&color=ffffff&margin=0`
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent('https://xposed.mabdullah.top')}&bgcolor=0f172a&color=ffffff&margin=0`
+  const accent = data.aura.hex
 
   return (
     <div
       ref={ref}
-      style={{ width: 1080, height: 1350, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif' }}
-      className="relative bg-slate-950 text-white p-12 flex flex-col justify-between overflow-hidden select-none"
+      style={{
+        width: 1080,
+        height: 1350,
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+        background: `linear-gradient(160deg, #0b1120 0%, #0f172a 40%, #131b2e 70%, #0f172a 100%)`,
+        borderRadius: 32,
+      }}
+      className="relative text-white p-14 flex flex-col justify-between overflow-hidden select-none shadow-2xl"
     >
-      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none" style={{ backgroundColor: `${data.aura.hex}25` }} />
-      <div className="absolute bottom-10 right-10 w-[400px] h-[400px] rounded-full blur-[100px] pointer-events-none" style={{ backgroundColor: `${data.aura.hex}15` }} />
+      {/* Subtle accent glow (solid, no CSS blur — safe for canvas) */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[500px] rounded-full pointer-events-none"
+        style={{
+          background: `radial-gradient(ellipse at center, ${accent}15 0%, transparent 70%)`,
+        }}
+      />
 
-      <div className="relative z-10 flex flex-col items-center text-center">
-        <span className="text-2xl font-black tracking-[0.3em] uppercase px-6 py-2.5 rounded-full border" style={{ color: data.aura.hex, backgroundColor: `${data.aura.hex}15`, borderColor: `${data.aura.hex}30` }}>
+      {/* ===== HEADER ===== */}
+      <div className="relative z-10 flex flex-col items-center text-center pt-2">
+        <span
+          className="text-2xl font-black tracking-[0.35em] uppercase px-7 py-3 rounded-full border-2"
+          style={{ color: accent, borderColor: `${accent}40`, backgroundColor: `${accent}12` }}
+        >
           X P O S E D
         </span>
 
-        <div className="mt-8 relative">
-          <div className="w-28 h-28 rounded-full p-[3px]" style={{ background: `linear-gradient(135deg, ${data.aura.hex}, #f59e0b)`, boxShadow: `0 0 40px ${data.aura.hex}40` }}>
-            <div
-              className="w-full h-full rounded-full bg-cover bg-center"
-              style={{ backgroundImage: `url(${data.avatarUrl})` }}
+        <div className="mt-9 relative">
+          <div
+            className="rounded-full"
+            style={{
+              width: 134,
+              height: 134,
+              padding: 4,
+              background: `linear-gradient(135deg, ${accent}, #f59e0b)`,
+              boxShadow: `0 0 0 1px ${accent}30`,
+            }}
+          >
+            <img
+              src={data.avatarUrl}
+              alt=""
+              className="w-full h-full rounded-full object-cover"
+              crossOrigin="anonymous"
             />
           </div>
         </div>
-        <h2 className="text-3xl font-bold text-slate-200 mt-4">@{data.username}</h2>
+        <h2 className="text-[32px] font-bold text-slate-100 mt-5">@{data.username}</h2>
       </div>
 
-      <div className="relative z-10 flex flex-col items-center justify-center my-4">
-        <div
-          className="text-[120px] font-black leading-none"
-          style={{
-            color: data.aura.hex,
-            filter: `drop-shadow(0 10px 35px ${data.aura.hex}60)`,
-          }}
+      {/* ===== SCORE ===== */}
+      <div className="relative z-10 flex flex-col items-center justify-center -my-2">
+        <span
+          className="font-black leading-none tracking-tight"
+          style={{ fontSize: 160, color: accent }}
         >
           {data.overallScore}
-        </div>
-        <span className="text-sm font-bold text-slate-400 tracking-[0.25em] uppercase mt-2">
+        </span>
+        <span className="text-lg font-bold text-slate-500 tracking-[0.3em] uppercase mt-3">
           OVERALL SCORE
         </span>
       </div>
 
-      <div className="relative z-10 grid grid-cols-2 gap-5 my-2">
-        <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl flex flex-col justify-center">
-          <span className="text-xs font-bold text-slate-400 tracking-wider uppercase flex items-center gap-1.5">
-            <span style={{ color: data.aura.hex }}>✦</span> AURA
+      {/* ===== STATS GRID ===== */}
+      <div className="relative z-10 grid grid-cols-2 gap-5">
+        <div className="rounded-2xl p-7 flex flex-col justify-center border" style={{ backgroundColor: '#111827cc', borderColor: '#1e293bcc' }}>
+          <span className="text-sm font-bold text-slate-400 tracking-wider uppercase flex items-center gap-2 mb-2">
+            <span style={{ color: accent }}>✦</span> AURA
           </span>
-          <span className="text-2xl font-black mt-1 truncate" style={{ color: data.aura.hex }}>{data.aura.vibe}</span>
+          <span className="text-[28px] font-black leading-tight" style={{ color: accent }}>{data.aura.vibe}</span>
         </div>
-        <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl flex flex-col justify-center">
-          <span className="text-xs font-bold text-slate-400 tracking-wider uppercase">🚫 BAN RISK</span>
-          <span className="text-3xl font-black text-red-500 mt-1">{data.banClock.score}%</span>
+        <div className="rounded-2xl p-7 flex flex-col justify-center border" style={{ backgroundColor: '#111827cc', borderColor: '#1e293bcc' }}>
+          <span className="text-sm font-bold text-slate-400 tracking-wider uppercase mb-2">🚫 BAN RISK</span>
+          <span className="text-[36px] font-black leading-tight text-red-400">{data.banClock.score}%</span>
         </div>
-        <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl flex flex-col justify-center">
-          <span className="text-xs font-bold text-slate-400 tracking-wider uppercase">✦ BEAUTY</span>
-          <span className="text-3xl font-black text-emerald-400 mt-1">{data.beautyRanking.score}</span>
+        <div className="rounded-2xl p-7 flex flex-col justify-center border" style={{ backgroundColor: '#111827cc', borderColor: '#1e293bcc' }}>
+          <span className="text-sm font-bold text-slate-400 tracking-wider uppercase mb-2">✦ BEAUTY</span>
+          <span className="text-[36px] font-black leading-tight text-emerald-400">{data.beautyRanking.score}</span>
         </div>
-        <div className="bg-slate-900/80 border border-slate-800 p-6 rounded-2xl flex flex-col justify-center">
-          <span className="text-xs font-bold text-slate-400 tracking-wider uppercase">📉 FLOP RATE</span>
-          <span className="text-3xl font-black text-amber-400 mt-1">{data.flopRate.percentage}%</span>
+        <div className="rounded-2xl p-7 flex flex-col justify-center border" style={{ backgroundColor: '#111827cc', borderColor: '#1e293bcc' }}>
+          <span className="text-sm font-bold text-slate-400 tracking-wider uppercase mb-2">📉 FLOP RATE</span>
+          <span className="text-[36px] font-black leading-tight text-amber-400">{data.flopRate.percentage}%</span>
         </div>
       </div>
 
-      <div className="relative z-10 bg-slate-900/90 border border-slate-800/90 p-6 rounded-2xl">
-        <span className="text-xs font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: data.aura.hex }}>
+      {/* ===== AI VERDICT ===== */}
+      <div className="relative z-10 rounded-2xl p-7 border" style={{ backgroundColor: '#111827e0', borderColor: `${accent}20` }}>
+        <span className="text-sm font-bold tracking-wider uppercase flex items-center gap-2 mb-3" style={{ color: accent }}>
           <span>✨</span> AI VERDICT
         </span>
-        <p className="text-xl font-medium text-slate-200 italic mt-2 leading-relaxed">
+        <p className="text-[24px] font-medium text-slate-200 italic leading-relaxed">
           &ldquo;{data.toast}&rdquo;
         </p>
       </div>
 
-      <div className="relative z-10 flex justify-between items-end pt-5 border-t border-slate-800/80">
-        <div className="flex items-center gap-4">
-          <span className="text-4xl">{data.spiritAnimal.emoji}</span>
+      {/* ===== FOOTER ===== */}
+      <div className="relative z-10 flex justify-between items-center pt-6 border-t border-slate-800/80">
+        <div className="flex items-center gap-5">
+          <span className="text-5xl leading-none">{data.spiritAnimal.emoji}</span>
           <div>
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">SPIRIT ANIMAL</span>
-            <span className="text-lg font-extrabold text-white">{data.spiritAnimal.animal}</span>
-            <p className="text-xs text-slate-400 mt-0.5">{data.spiritAnimal.description}</p>
+            <span className="text-sm font-bold text-slate-500 uppercase tracking-wider block mb-0.5">SPIRIT ANIMAL</span>
+            <span className="text-[28px] font-extrabold text-white leading-tight">{data.spiritAnimal.animal}</span>
+            <p className="text-base text-slate-400 mt-1 leading-snug">{data.spiritAnimal.description}</p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
           <div className="text-right">
-            <span className="text-xs text-slate-500 block">Xposed by</span>
-            <span className="text-sm font-bold text-slate-300">xposed.mabdullah.top</span>
+            <span className="text-sm text-slate-500 block font-medium">xposed.mabdullah.top</span>
           </div>
-          <img src={qrUrl} alt="QR" className="w-16 h-16 rounded-lg" style={{ backgroundColor: `${data.aura.hex}15`, border: `1px solid ${data.aura.hex}30` }} crossOrigin="anonymous" />
+          <img
+            src={qrUrl}
+            alt="QR"
+            className="w-[72px] h-[72px] rounded-xl"
+            style={{ border: `1px solid ${accent}30` }}
+            crossOrigin="anonymous"
+          />
         </div>
       </div>
     </div>
