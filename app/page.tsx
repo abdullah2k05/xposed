@@ -113,8 +113,7 @@ export default function Home() {
 
     const shareData: ShareData = {
       text:
-        `I just got xposed! 🫣 Score: ${result.overallScore}/100 — Aura: ${result.aura.vibe}`,
-      url: 'https://xposed.mabdullah.top',
+        `I just got xposed! 🫣 Score: ${result.overallScore}/100 — Aura: ${result.aura.vibe}\n\nshare yours\nhttps://xposed.mabdullah.top`,
     }
 
     if (navigator.canShare && navigator.canShare({ files: [new File([blob], 'xposed.png', { type: 'image/png' })] })) {
@@ -123,7 +122,7 @@ export default function Home() {
     } else {
       window.open(
         `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-          `I just got xposed! 🫣\n\nScore: ${result.overallScore}/100\nAura: ${result.aura.color} — ${result.aura.vibe}\nBan Risk: ${result.banClock.score}%\nBeauty: ${result.beautyRanking.score}/100\nFlop Rate: ${result.flopRate.percentage}%\nSpirit Animal: ${result.spiritAnimal.emoji} ${result.spiritAnimal.animal}\n\nGet exposed at:`
+          `I just got xposed! 🫣\n\nScore: ${result.overallScore}/100\nAura: ${result.aura.color} — ${result.aura.vibe}\nBan Risk: ${result.banClock.score}%\nBeauty: ${result.beautyRanking.score}/100\nFlop Rate: ${result.flopRate.percentage}%\nSpirit Animal: ${result.spiritAnimal.emoji} ${result.spiritAnimal.animal}\n\nshare yours\nhttps://xposed.mabdullah.top`
         )}&url=${encodeURIComponent('https://xposed.mabdullah.top')}`,
         '_blank',
         'noopener'
