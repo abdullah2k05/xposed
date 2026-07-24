@@ -19,11 +19,17 @@ export default function Home() {
   const [downloaded, setDownloaded] = useState(false)
   const [linkCopied, setLinkCopied] = useState(false)
   const [assetsReady, setAssetsReady] = useState(false)
-  const cardRef = useRef<HTMLDivElement>(null)
+  const captureRef = useRef<HTMLDivElement>(null)
+  const [fontsLoaded, setFontsLoaded] = useState(false)
+
+  useEffect(() => {
+    document.fonts.ready.then(() => setFontsLoaded(true))
+  }, [])
 
   useEffect(() => {
     if (!result) { setAssetsReady(false); return }
-    const imgs = document.querySelectorAll('#share-card img')
+    if (!fontsLoaded) return
+    const imgs = document.querySelectorAll('#share-card img, #share-card div[style*="background-image"]')
     if (imgs.length === 0) { setAssetsReady(true); return }
     let loaded = 0
     imgs.forEach((img) => {
@@ -41,7 +47,7 @@ export default function Home() {
       }
     })
     if (loaded === imgs.length) setAssetsReady(true)
-  }, [result])
+  }, [result, fontsLoaded])
 
   const handleAnalyze = useCallback(async (username: string) => {
     setLoading(true)
@@ -63,21 +69,33 @@ export default function Home() {
     }
   }, [])
 
+  const captureCard = async (): Promise<Blob | null> => {
+    if (!captureRef.current) return null
+    await document.fonts.ready
+    const canvas = await html2canvas(captureRef.current, {
+      backgroundColor: null,
+      scale: 1,
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      width: 1080,
+      height: 1350,
+    })
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => resolve(blob), 'image/png')
+    })
+  }
+
   const handleDownload = async () => {
-    if (!cardRef.current) return
     setDownloading(true)
     try {
-      const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: null,
-        scale: 3,
-        useCORS: true,
-        allowTaint: false,
-        logging: false,
-      })
+      const blob = await captureCard()
+      if (!blob) return
       const link = document.createElement('a')
       link.download = `xposed-${result?.username}.png`
-      link.href = canvas.toDataURL()
+      link.href = URL.createObjectURL(blob)
       link.click()
+      URL.revokeObjectURL(link.href)
       setDownloaded(true)
       setTimeout(() => setDownloaded(false), 3000)
     } catch (err) {
@@ -87,23 +105,29 @@ export default function Home() {
     }
   }
 
-  const handleShare = () => {
+  const handleShareImage = async () => {
     if (!result) return
-    const text =
-      `I just got xposed! 🫣\n\n` +
-      `Score: ${result.overallScore}/100\n` +
-      `Aura: ${result.aura.color} — ${result.aura.vibe}\n` +
-      `Ban Risk: ${result.banClock.score}%\n` +
-      `Beauty: ${result.beautyRanking.score}/100\n` +
-      `Flop Rate: ${result.flopRate.percentage}%\n` +
-      `Spirit Animal: ${result.spiritAnimal.emoji} ${result.spiritAnimal.animal}\n\n` +
-      `Get exposed at:`
+    const blob = await captureCard()
+    if (!blob) return
 
-    window.open(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent('https://xposed.mabdullah.top')}`,
-      '_blank',
-      'noopener'
-    )
+    const shareData: ShareData = {
+      text:
+        `I just got xposed! 🫣 Score: ${result.overallScore}/100 — Aura: ${result.aura.vibe}`,
+      url: 'https://xposed.mabdullah.top',
+    }
+
+    if (navigator.canShare && navigator.canShare({ files: [new File([blob], 'xposed.png', { type: 'image/png' })] })) {
+      const file = new File([blob], 'xposed.png', { type: 'image/png' })
+      await navigator.share({ ...shareData, files: [file] })
+    } else {
+      window.open(
+        `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          `I just got xposed! 🫣\n\nScore: ${result.overallScore}/100\nAura: ${result.aura.color} — ${result.aura.vibe}\nBan Risk: ${result.banClock.score}%\nBeauty: ${result.beautyRanking.score}/100\nFlop Rate: ${result.flopRate.percentage}%\nSpirit Animal: ${result.spiritAnimal.emoji} ${result.spiritAnimal.animal}\n\nGet exposed at:`
+        )}&url=${encodeURIComponent('https://xposed.mabdullah.top')}`,
+        '_blank',
+        'noopener'
+      )
+    }
   }
 
   const handleCopyLink = () => {
@@ -155,13 +179,23 @@ export default function Home() {
               <p className="text-xs text-gray-500 mt-1">This image will be downloaded. Share it on X.</p>
             </div>
 
-            {/* Share Card — dedicated export component */}
-            <div className="flex justify-center">
-              <div className="scale-[0.85] sm:scale-100 origin-top">
-                <div id="share-card">
-                  <ShareCard ref={cardRef} data={result} />
+            {/* Preview: scaled visible card */}
+            <div className="flex justify-center w-full max-w-[380px] sm:max-w-[500px] md:max-w-[650px] mx-auto">
+              <div className="relative w-full" style={{ aspectRatio: '1080 / 1350' }}>
+                <div className="absolute inset-0 overflow-hidden rounded-[32px]">
+                  <div style={{ width: 1080, height: 1350, transformOrigin: '0 0' }} className="scale-[0.352] sm:scale-[0.463] md:scale-[0.602]">
+                    <ShareCard data={result} />
+                  </div>
                 </div>
               </div>
+            </div>
+
+            {/* Capture target: fixed 1080x1350 off-screen */}
+            <div
+              ref={captureRef}
+              style={{ position: 'absolute', left: -9999, top: 0, zIndex: -1 }}
+            >
+              <ShareCard data={result} />
             </div>
 
             <div className="flex flex-col sm:flex-row justify-center gap-3 mt-8">
@@ -178,11 +212,12 @@ export default function Home() {
                 {downloading ? 'Rendering...' : 'Download Image'}
               </button>
               <button
-                onClick={handleShare}
+                onClick={handleShareImage}
+                disabled={!assetsReady}
                 className="btn-secondary w-full sm:w-auto"
               >
                 <Share2 className="w-5 h-5" />
-                Share on X
+                Share Image
               </button>
               <button
                 onClick={handleCopyLink}
@@ -202,7 +237,7 @@ export default function Home() {
             )}
             {downloaded && (
               <p className="text-center text-xs text-emerald-400 font-medium mt-2">
-                Downloaded at 3× resolution (sharp on all screens)
+                Downloaded at 1080×1350 — sharp on all screens
               </p>
             )}
 
