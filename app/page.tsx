@@ -27,26 +27,8 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    if (!result) { setAssetsReady(false); return }
-    if (!fontsLoaded) return
-    const imgs = document.querySelectorAll('#share-card img, #share-card div[style*="background-image"]')
-    if (imgs.length === 0) { setAssetsReady(true); return }
-    let loaded = 0
-    imgs.forEach((img) => {
-      if ((img as HTMLImageElement).complete) {
-        loaded++
-      } else {
-        img.addEventListener('load', () => {
-          loaded++
-          if (loaded === imgs.length) setAssetsReady(true)
-        })
-        img.addEventListener('error', () => {
-          loaded++
-          if (loaded === imgs.length) setAssetsReady(true)
-        })
-      }
-    })
-    if (loaded === imgs.length) setAssetsReady(true)
+    if (!result) return
+    setAssetsReady(fontsLoaded)
   }, [result, fontsLoaded])
 
   const handleAnalyze = useCallback(async (username: string) => {
