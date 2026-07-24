@@ -6,6 +6,7 @@ import { Download, Share2, Link, Check } from 'lucide-react'
 import SearchInput from '@/components/SearchInput'
 import Results from '@/components/Results'
 import TopUsers from '@/components/TopUsers'
+import Donate from '@/components/Donate'
 import type { XposedResult, StoredProfile } from '@/lib/types'
 
 export default function Home() {
@@ -158,6 +159,9 @@ export default function Home() {
                 <p className="text-center text-xs text-emerald-400 font-medium">Image downloaded!</p>
               )}
             </div>
+            <div className="flex justify-center">
+              <Donate />
+            </div>
           </>
         )}
 
@@ -169,7 +173,8 @@ export default function Home() {
         )}
 
         <footer className="mt-16 sm:mt-24 text-center pb-6 sm:pb-8">
-          <p className="text-xs text-gray-700">
+          <Donate />
+          <p className="text-xs text-gray-700 mt-8">
             xposed — not affiliated with X Corp. Profiles are analyzed using public data.
           </p>
         </footer>
