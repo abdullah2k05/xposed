@@ -1,7 +1,6 @@
 'use client'
 
 import type { XposedResult } from '@/lib/types'
-import BanClock from './BanClock'
 import ProfileRating from './ProfileRating'
 import AuraAnalysis from './AuraAnalysis'
 import BeautyRanking from './BeautyRanking'
@@ -34,24 +33,23 @@ export default function Results({ data }: { data: XposedResult }) {
             </p>
           </div>
         </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <BanClock data={data.banClock} />
-        <ProfileRating data={data.profileRating} />
+        <div className="flex items-center justify-center gap-4 mt-2 text-xs text-gray-600">
+          <span>Ban risk: <span className="text-red-400 font-semibold">{data.banClock.score}%</span></span>
+          <span>·</span>
+          <span>Rating: <span className="text-yellow-400 font-semibold">{data.profileRating.overall}/10</span></span>
+          <span>·</span>
+          <span>Beauty: <span className="text-emerald-400 font-semibold">{data.beautyRanking.score}/100</span></span>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <AuraAnalysis data={data.aura} />
-        <BeautyRanking data={data.beautyRanking} />
+        <ProfileRating data={data.profileRating} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <BeautyRanking data={data.beautyRanking} />
         <NpcClassCard data={data.npcClass} />
-        <div className="bg-gray-900/60 backdrop-blur-xl rounded-2xl border border-gray-800 p-6 flex flex-col items-center justify-center text-center">
-          <div className="text-5xl mb-2" style={{ color: data.aura.hex }}>{data.overallScore}</div>
-          <p className="text-sm text-gray-500">Overall Score</p>
-        </div>
       </div>
 
       <FunExtras data={data} />

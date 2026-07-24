@@ -1,7 +1,7 @@
 'use client'
 
 import type { XposedResult } from '@/lib/types'
-import { MessageSquareQuote, Hash, TrendingDown, PawPrint, Heart } from 'lucide-react'
+import { TrendingDown, PawPrint, Heart } from 'lucide-react'
 
 interface FunExtrasProps {
   data: XposedResult
@@ -9,31 +9,6 @@ interface FunExtrasProps {
 
 export default function FunExtras({ data }: FunExtrasProps) {
   const items = [
-    {
-      icon: MessageSquareQuote,
-      label: 'Signature Tweet',
-      content: (
-        <div>
-          <p className="text-sm text-white italic mb-2">"{data.signatureTweet.text}"</p>
-          <p className="text-xs text-gray-500">{data.signatureTweet.commentary}</p>
-        </div>
-      ),
-    },
-    {
-      icon: Hash,
-      label: 'Overused Word',
-      content: (
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-xl font-black text-pink-400">"{data.overusedWord.word}"</span>
-            <span className="text-xs bg-gray-800 px-2 py-0.5 rounded-full text-gray-400">
-              x{data.overusedWord.count}
-            </span>
-          </div>
-          <p className="text-xs text-gray-500">{data.overusedWord.commentary}</p>
-        </div>
-      ),
-    },
     {
       icon: TrendingDown,
       label: 'Flop Rate',
