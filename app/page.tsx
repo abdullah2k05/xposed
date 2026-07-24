@@ -27,8 +27,27 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    if (!result) return
-    setAssetsReady(fontsLoaded)
+    if (!result) { setAssetsReady(false); return }
+    if (!fontsLoaded) return
+    const checkImages = () => {
+      const imgs = captureRef.current?.querySelectorAll('img')
+      if (!imgs || imgs.length === 0) { setAssetsReady(true); return }
+      const allLoaded = Array.from(imgs).every((img) => img.complete && img.naturalWidth > 0)
+      if (allLoaded) { setAssetsReady(true); return }
+      let loaded = 0
+      imgs.forEach((img) => {
+        if (img.complete && img.naturalWidth > 0) { loaded++; return }
+        img.addEventListener('load', () => {
+          loaded++
+          if (loaded === imgs.length) setAssetsReady(true)
+        }, { once: true })
+        img.addEventListener('error', () => {
+          loaded++
+          if (loaded === imgs.length) setAssetsReady(true)
+        }, { once: true })
+      })
+    }
+    checkImages()
   }, [result, fontsLoaded])
 
   const handleAnalyze = useCallback(async (username: string) => {
@@ -61,7 +80,7 @@ export default function Home() {
       allowTaint: false,
       logging: false,
       width: 1080,
-      height: 1350,
+      height: 1920,
     })
     return new Promise((resolve) => {
       canvas.toBlob((blob) => resolve(blob), 'image/png')
@@ -163,9 +182,9 @@ export default function Home() {
 
             {/* Preview: scaled visible card */}
             <div className="flex justify-center w-full max-w-[380px] sm:max-w-[500px] md:max-w-[650px] mx-auto">
-              <div className="relative w-full" style={{ aspectRatio: '1080 / 1350' }}>
+              <div className="relative w-full" style={{ aspectRatio: '1080 / 1920' }}>
                 <div className="absolute inset-0 overflow-hidden rounded-[32px]">
-                  <div style={{ width: 1080, height: 1350, transformOrigin: '0 0' }} className="scale-[0.352] sm:scale-[0.463] md:scale-[0.602]">
+                  <div style={{ width: 1080, height: 1920, transformOrigin: '0 0' }} className="scale-[0.352] sm:scale-[0.463] md:scale-[0.602]">
                     <ShareCard data={result} />
                   </div>
                 </div>
@@ -219,7 +238,7 @@ export default function Home() {
             )}
             {downloaded && (
               <p className="text-center text-xs text-emerald-400 font-medium mt-2">
-                Downloaded at 1080×1350 — sharp on all screens
+                Downloaded at 2160×3840 — sharp on all screens
               </p>
             )}
 
