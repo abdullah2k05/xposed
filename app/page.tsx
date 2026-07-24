@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react'
 import html2canvas from 'html2canvas'
-import { Camera, Check, Link, Download } from 'lucide-react'
+import { Camera, Check, Link } from 'lucide-react'
 import SearchInput from '@/components/SearchInput'
 import Results from '@/components/Results'
 import TopUsers from '@/components/TopUsers'
@@ -59,22 +59,19 @@ export default function Home() {
       const shareUrl = 'https://xposed.mabdullah.top'
       const shareText = `I just got xposed! Score: ${result?.overallScore}/100 | Ban: ${result?.banClock.score}% | Aura: ${result?.aura.color}`
 
-      // Try native share (mobile — shares image + text together)
       if (navigator.canShare && navigator.canShare({ files: [file], text: shareText, url: shareUrl })) {
         await navigator.share({ files: [file], text: shareText, url: shareUrl })
       } else {
-        // Fallback: copy image to clipboard + open tweet intent
         try {
           await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
         } catch {
-          // If clipboard fails, download the image
           const link = document.createElement('a')
           link.download = `xposed-${result?.username}.png`
           link.href = canvas.toDataURL()
           link.click()
         }
         window.open(
-          `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText + '\n\n📸 Image copied to clipboard — paste it here!\n\n')}&url=${encodeURIComponent(shareUrl)}`,
+          `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText + '\n\n📸 Image copied — paste it here!\n\n')}&url=${encodeURIComponent(shareUrl)}`,
           '_blank',
           'noopener'
         )
@@ -96,16 +93,16 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen px-4 py-12 md:py-20">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-6xl md:text-8xl font-black text-white tracking-tight">
+    <main className="min-h-screen px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16">
+      <div className="max-w-5xl mx-auto">
+        <header className="text-center mb-8 sm:mb-12 md:mb-16">
+          <h1 className="text-[2.5rem] leading-tight sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight">
             xposed
           </h1>
-          <p className="text-lg text-gray-500 mt-3">
+          <p className="text-base sm:text-lg text-gray-500 mt-2 sm:mt-3 max-w-readable mx-auto">
             Enter any <span className="text-white font-semibold">X username</span> and get your profile exposed.
           </p>
-        </div>
+        </header>
 
         <SearchInput onAnalyze={handleAnalyze} loading={loading} />
 
@@ -116,51 +113,58 @@ export default function Home() {
         )}
 
         {loading && (
-          <div className="mt-16 text-center">
-            <div className="inline-flex items-center gap-3 bg-gray-900/60 px-6 py-3 rounded-full border border-gray-800">
+          <div className="mt-12 sm:mt-16 text-center">
+            <div className="inline-flex items-center gap-3 bg-gray-900/60 px-5 py-3 rounded-xl border border-gray-800">
               <div className="w-5 h-5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
-              <span className="text-gray-400 text-sm">Fetching tweets, reading aura, calculating score...</span>
+              <span className="text-gray-400 text-sm">Reading aura, calculating score...</span>
             </div>
           </div>
         )}
 
         {result && (
-          <div ref={resultsRef} className="space-y-8">
-            <Results data={result} />
-
-            <div className="flex justify-center gap-3 pb-8">
-              <button
-                onClick={handleCapture}
-                disabled={capturing}
-                className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white font-bold text-base transition-all shadow-lg shadow-purple-500/25"
-              >
-                {capturing ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : captured ? (
-                  <Check className="w-5 h-5" />
-                ) : (
-                  <Camera className="w-5 h-5" />
-                )}
-                {capturing ? 'Capturing...' : captured ? 'Shared!' : '📸 Capture & Share'}
-              </button>
-              <button
-                onClick={handleCopyLink}
-                className="flex items-center gap-2 px-6 py-3.5 rounded-2xl bg-gray-800 hover:bg-gray-700 text-white font-bold text-base transition-all border border-gray-700"
-              >
-                {linkCopied ? (
-                  <Check className="w-5 h-5 text-green-400" />
-                ) : (
-                  <Link className="w-5 h-5" />
-                )}
-                {linkCopied ? 'Copied!' : 'Copy Link'}
-              </button>
+          <>
+            <hr className="my-10 sm:my-14 border-gray-800/60" />
+            <div ref={resultsRef} className="space-y-5 sm:space-y-6">
+              <Results data={result} />
+              <div className="flex flex-col sm:flex-row justify-center gap-3 pt-4">
+                <button
+                  onClick={handleCapture}
+                  disabled={capturing}
+                  className="btn-primary w-full sm:w-auto"
+                >
+                  {capturing ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : captured ? (
+                    <Check className="w-5 h-5" />
+                  ) : (
+                    <Camera className="w-5 h-5" />
+                  )}
+                  {capturing ? 'Capturing...' : captured ? 'Shared!' : 'Capture & Share'}
+                </button>
+                <button
+                  onClick={handleCopyLink}
+                  className="btn-secondary w-full sm:w-auto"
+                >
+                  {linkCopied ? (
+                    <Check className="w-5 h-5 text-green-400" />
+                  ) : (
+                    <Link className="w-5 h-5" />
+                  )}
+                  {linkCopied ? 'Copied!' : 'Copy Link'}
+                </button>
+              </div>
             </div>
-          </div>
+          </>
         )}
 
-        {topUsers.length > 0 && <TopUsers users={topUsers} />}
+        {topUsers.length > 0 && (
+          <>
+            <hr className="my-14 sm:my-20 border-gray-800/60" />
+            <TopUsers users={topUsers} />
+          </>
+        )}
 
-        <footer className="mt-32 text-center pb-8">
+        <footer className="mt-16 sm:mt-24 text-center pb-6 sm:pb-8">
           <p className="text-xs text-gray-700">
             xposed — not affiliated with X Corp. Profiles are analyzed using public data.
           </p>

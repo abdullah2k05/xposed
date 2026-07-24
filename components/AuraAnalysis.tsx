@@ -4,26 +4,26 @@ import type { Aura as AuraType } from '@/lib/types'
 
 export default function AuraAnalysis({ data }: { data: AuraType }) {
   return (
-    <div className="bg-gray-900/60 backdrop-blur-xl rounded-2xl border border-gray-800 p-6">
-      <div className="flex items-center gap-4 mb-4">
+    <div className="card">
+      <div className="flex items-center gap-3 sm:gap-4 mb-4">
         <div
-          className="w-14 h-14 rounded-2xl shadow-lg flex-shrink-0"
+          className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl shadow-lg shrink-0"
           style={{ backgroundColor: data.hex }}
         />
-        <div>
-          <h3 className="text-lg font-bold text-white">Your Aura</h3>
-          <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: data.hex }}>
+        <div className="min-w-0">
+          <h3 className="text-base sm:text-lg font-bold text-white">Your Aura</h3>
+          <span className="text-xs font-semibold uppercase tracking-wider truncate block" style={{ color: data.hex }}>
             {data.color}
           </span>
         </div>
-        <div className="ml-auto">
-          <span className="text-sm font-mono text-gray-500">{data.hex}</span>
+        <div className="ml-auto shrink-0">
+          <span className="text-xs font-mono text-gray-500">{data.hex}</span>
         </div>
       </div>
-      <div className="inline-block px-3 py-1 rounded-full bg-gray-800 text-sm text-purple-300 mb-3">
+      <div className="inline-block px-3 py-1 rounded-full bg-gray-800 text-xs sm:text-sm text-purple-300 mb-3">
         {data.vibe}
       </div>
-      <p className="text-sm text-gray-400 leading-relaxed">{data.description}</p>
+      <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">{data.description}</p>
     </div>
   )
 }
