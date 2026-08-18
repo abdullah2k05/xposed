@@ -259,6 +259,17 @@ export default function Home() {
           <p className="text-xs text-gray-700 mt-8">
             xposed — not affiliated with X Corp. Profiles are analyzed using public data.
           </p>
+          <p className="text-xs text-gray-700 mt-2">
+            Developed by{" "}
+            <a
+              href="https://mabdullah.top"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-gray-400"
+            >
+              Muhammad Abdullah
+            </a>
+          </p>
         </footer>
       </div>
     </main>
